@@ -461,12 +461,16 @@ class MainActivity : AppCompatActivity() {
         jsonObject.put("getClientExtensionResults", JSONObject())
         jsonObject.put("response", response)
 
+        val jsonResp = JSONObject()
+        jsonResp.put("response", jsonObject)
+        jsonResp.put("username", usernameButton.text)
+
         val mediaType = "application/json".toMediaTypeOrNull()
-        val requestBody = RequestBody.create(mediaType, jsonObject.toString())
+        val requestBody = RequestBody.create(mediaType, jsonResp.toString())
 
         try {
             RPApiService.getApi()
-                .authComplete("username=${usernameButton.text.toString()}", requestBody)
+                .authComplete(requestBody)
                 .enqueue(object : Callback<ResponseBody> {
                     override fun onResponse(
                         call: Call<ResponseBody>,

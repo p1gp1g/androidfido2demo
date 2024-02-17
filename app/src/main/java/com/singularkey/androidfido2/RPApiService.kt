@@ -53,9 +53,8 @@ interface RPApi {
     fun authInitiate(@Body postBody: RequestBody): Call<ResponseBody>
 
     @Headers("Accept: application/json", "Content-Type: application/json")
-    @POST("auth/complete")
+    @POST("authentication/verification")
     fun authComplete(
-        @Header("Cookie") cookie: String,
         @Body postBody: RequestBody
     ): Call<ResponseBody>
 
