@@ -13,14 +13,14 @@
 
         >
 
-        <ImageView
-            android:id="@+id/imageView2"
-            android:layout_width="297dp"
-            android:layout_height="51dp"
-            android:layout_marginTop="80px"
-            app:srcCompat="@drawable/sklogo"
+        <TextView
+            style="@style/TextAppearance.AppCompat.Headline"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:layout_gravity="center"
-            />
+            android:layout_margin="80px"
+            android:text="Login to WebAuthn.io"
+            android:textAlignment="center" />
 
     </LinearLayout>
 
