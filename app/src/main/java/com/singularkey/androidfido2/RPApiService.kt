@@ -24,6 +24,7 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Call
 import retrofit2.Retrofit
 import retrofit2.http.Body
+import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.Headers
 import retrofit2.http.POST
@@ -32,6 +33,9 @@ import java.net.CookiePolicy
 import java.util.concurrent.TimeUnit
 
 interface RPApi {
+
+    @GET("/")
+    fun init() : Call<ResponseBody>
     @Headers("Accept: application/json", "Content-Type: application/json")
     @POST("register/initiate")
     fun registerInitiate(@Body postBody: RequestBody): Call<ResponseBody>
@@ -45,7 +49,7 @@ interface RPApi {
     //fun registerComplete(@Body body: RequestBody): Call<ResponseBody>
 
     @Headers("Accept: application/json", "Content-Type: application/json")
-    @POST("auth/initiate")
+    @POST("authentication/options")
     fun authInitiate(@Body postBody: RequestBody): Call<ResponseBody>
 
     @Headers("Accept: application/json", "Content-Type: application/json")

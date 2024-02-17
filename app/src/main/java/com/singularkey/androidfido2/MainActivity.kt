@@ -35,7 +35,7 @@ import retrofit2.Callback
 import retrofit2.Response
 
 //var RP_SERVER_URL = "https://12841968ac5b.ngrok.io";  //e.g., https://api.singularkey.com
-var RP_SERVER_URL = "https://webauthndemo.singularkey.com";  //e.g., https://api.singularkey.com
+var RP_SERVER_URL = "https://webauthn.io";  //e.g., https://api.singularkey.com
 
 //var RPID = "12841968ac5b.ngrok.io"                     // e.g., api.yourcompany.com
 var RPID = "webauthndemo.singularkey.com"                     // e.g., api.yourcompany.com
@@ -147,7 +147,7 @@ class MainActivity : AppCompatActivity() {
                             var authenticatorAttachement = ""
                             if (intiateResponse.has("authenticatorSelection")) {
                                 if (intiateResponse?.getJSONObject("authenticatorSelection")
-                                        .has("authenticatorAttachment")
+                                        ?.has("authenticatorAttachment") == true
                                 ) {
                                     authenticatorAttachement =
                                         intiateResponse?.getJSONObject("authenticatorSelection")
@@ -326,9 +326,27 @@ class MainActivity : AppCompatActivity() {
     //**********************************************************************************************************//
     private fun fido2AuthInitiate() {
 
+        RPApiService.getApi().init().enqueue(object : Callback<ResponseBody> {
+            override fun onResponse(
+                call: Call<ResponseBody>,
+                response: Response<ResponseBody>
+            ) {
+                sendFido2AuthInitiate()
+            }
+
+            override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
+                Log.d("response", t.message)
+
+            }
+        })
+    }
+
+    private fun sendFido2AuthInitiate() {
+
         val result = JSONObject()
         val mediaType = "application/json".toMediaTypeOrNull()
         result.put("username", usernameButton.text.toString())
+        result.put("user_verification", "preferred")
         val requestBody = RequestBody.create(mediaType, result.toString())
         try {
             RPApiService.getApi().authInitiate(requestBody)
@@ -368,11 +386,12 @@ class MainActivity : AppCompatActivity() {
     //******************************* Invoke Android FIDO2 API  ************************************************//
     //**********************************************************************************************************//
     private fun fido2AndroidAuth(
-        allowCredentials: JSONArray,
+        allowCredentials: JSONArray?,
         challenge: ByteArray
     ) {
         try {
             val list = mutableListOf<PublicKeyCredentialDescriptor>()
+            val allowCredentials = allowCredentials ?: return
             for (i in 0..(allowCredentials.length() - 1)) {
                 val item = allowCredentials.getJSONObject(i)
                 list.add(
