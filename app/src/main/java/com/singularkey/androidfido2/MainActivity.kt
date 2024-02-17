@@ -18,11 +18,13 @@ package com.singularkey.androidfido2
 
 import android.content.Intent
 import android.content.IntentSender
+import android.net.Uri
 import android.os.Bundle
 import android.util.Base64
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.gms.fido.Fido
+import com.google.android.gms.fido.fido2.Fido2PrivilegedApiClient
 import com.google.android.gms.fido.fido2.api.common.*
 import kotlinx.android.synthetic.main.activity_main.*
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -220,7 +222,7 @@ class MainActivity : AppCompatActivity() {
                         userId.toByteArray(),
                         userId,
                         null,
-                        userName
+                        userName ?: "test"
                     )
                 )
                 .setChallenge(challenge)
@@ -403,23 +405,29 @@ class MainActivity : AppCompatActivity() {
                 )
             }
 
-            val options = PublicKeyCredentialRequestOptions.Builder()
-                .setRpId(RPID)
-                .setAllowList(list)
-                .setChallenge(challenge)
+            if (list.size < 1) return
+
+            val options = BrowserPublicKeyCredentialRequestOptions.Builder()
+                .setOrigin(Uri.parse("https://webauthn.io"))
+                .setPublicKeyCredentialRequestOptions(PublicKeyCredentialRequestOptions(challenge,60000.toDouble(),"webauthn.io",list,1337,null,null,null))
+                //.setPublicKeyCredentialRequestOptions(list.first())
                 .build()
 
-            val fido2ApiClient = Fido.getFido2ApiClient(applicationContext)
-            val fido2PendingIntentTask = fido2ApiClient.getSignIntent(options)
-            fido2PendingIntentTask.addOnSuccessListener { fido2PendingIntent ->
-                if (fido2PendingIntent.hasPendingIntent()) {
-                    try {
-                        Log.d(LOG_TAG, "launching Fido2 Pending Intent")
-                        fido2PendingIntent.launchPendingIntent(this@MainActivity, REQUEST_CODE_SIGN)
-                    } catch (e: IntentSender.SendIntentException) {
-                        e.printStackTrace()
-                    }
-                }
+            val fido2ApiClient = Fido2PrivilegedApiClient(applicationContext)
+            val fido2PendingIntentTask = fido2ApiClient.getSignPendingIntent(options)
+            fido2PendingIntentTask.addOnSuccessListener { pendingIntent ->
+                this@MainActivity.startIntentSenderForResult(
+                    pendingIntent.intentSender,
+                    REQUEST_CODE_SIGN,
+                    null, // fillInIntent
+                    0, // flagsMask
+                    0, // flagsValue
+                    0) //extraFlags
+            }
+
+
+            fido2PendingIntentTask.addOnFailureListener {
+                val errCode = "FAILED_TO_GET_SIGNING_INTENT"
             }
         } catch (e: Exception) {
             e.printStackTrace()
