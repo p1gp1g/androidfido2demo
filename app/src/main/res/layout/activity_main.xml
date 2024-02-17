@@ -54,11 +54,12 @@
             <Button
                 android:id="@+id/registerFido2Button"
                 style="@style/Widget.AppCompat.Button.Colored"
-                android:background="#99c852"
                 android:layout_width="150dp"
                 android:layout_height="wrap_content"
                 android:layout_margin="8dp"
+                android:background="#99c852"
                 android:text="@string/register_fido2"
+                android:visibility="gone"
                 app:layout_constraintEnd_toStartOf="@id/loginFido2Button"
                 app:layout_constraintStart_toStartOf="parent" />
 
