@@ -407,10 +407,27 @@ class MainActivity : AppCompatActivity() {
 
             if (list.size < 1) return
 
+            /*val options = PublicKeyCredentialRequestOptions.Builder()
+                .setRpId(RPID)
+                .setAllowList(list)
+                .setChallenge(challenge)
+                .build()
+
+            val fido2ApiClient = Fido.getFido2ApiClient(applicationContext)
+            val fido2PendingIntentTask = fido2ApiClient.getSignIntent(options)
+            fido2PendingIntentTask.addOnSuccessListener { fido2PendingIntent ->
+                if (fido2PendingIntent.hasPendingIntent()) {
+                    try {
+                        Log.d(LOG_TAG, "launching Fido2 Pending Intent")
+                        fido2PendingIntent.launchPendingIntent(this@MainActivity, REQUEST_CODE_SIGN)
+                    } catch (e: IntentSender.SendIntentException) {
+                        e.printStackTrace()
+                    }
+                }
+            }*/
             val options = BrowserPublicKeyCredentialRequestOptions.Builder()
                 .setOrigin(Uri.parse("https://webauthn.io"))
                 .setPublicKeyCredentialRequestOptions(PublicKeyCredentialRequestOptions(challenge,60000.toDouble(),"webauthn.io",list,1337,null,null,null))
-                //.setPublicKeyCredentialRequestOptions(list.first())
                 .build()
 
             val fido2ApiClient = Fido2PrivilegedApiClient(applicationContext)
@@ -429,6 +446,7 @@ class MainActivity : AppCompatActivity() {
             fido2PendingIntentTask.addOnFailureListener {
                 val errCode = "FAILED_TO_GET_SIGNING_INTENT"
             }
+            // */
         } catch (e: Exception) {
             e.printStackTrace()
         }
